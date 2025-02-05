@@ -3,7 +3,9 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/libs/gvga/**",
+                "~/pico/pico-sdk/**"
             ],
             "defines": [],
             "macFrameworkPath": [

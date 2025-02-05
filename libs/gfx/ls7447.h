@@ -7,5 +7,9 @@ extern int nh2;
 extern int dx;
 extern int dy;
 
-extern void draw_numbers(GVga *gvga, char *s, int x, int y, int color);
-extern void draw_digit(GVga *gvga, int x, int y, int color, int digit);
+#ifndef EXTERN_C
+#define EXTERN_C extern "C"
+#endif
+
+EXTERN_C void draw_numbers(GVga *gvga, char *s, int x, int y, int color);
+EXTERN_C void draw_digit(GVga *gvga, int x, int y, int color, int digit);

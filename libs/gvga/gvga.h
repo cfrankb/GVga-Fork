@@ -5,10 +5,11 @@
 #include <stdbool.h>
 #include "gvga_font.h"
 
-#define GVGA_COLOR(r,g,b) (((b)<<11u)|((g)<<6)|((r)<<0))
+#define GVGA_COLOR(r, g, b) (((b) << 11u) | ((g) << 6) | ((r) << 0))
 typedef uint16_t GVgaColor;
 
-enum {
+enum
+{
     GVGA_TOP = 0,
     GVGA_BOTTOM = 1,
     GVGA_LEFT = 2,
@@ -19,7 +20,8 @@ enum {
 #error "This library requires PICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS to be at least 320"
 #endif
 
-typedef enum {
+typedef enum
+{
     GVGA_BLACK = GVGA_COLOR(0, 0, 0),
     GVGA_BLUE = GVGA_COLOR(0, 0, 0x1f),
     GVGA_GREEN = GVGA_COLOR(0, 0x1f, 0),
@@ -32,14 +34,16 @@ typedef enum {
     GVGA_WHITE = GVGA_COLOR(0x1f, 0x1f, 0x1f),
 } GDviColor;
 
-typedef enum {
+typedef enum
+{
     GVGA_MODE_BITMAP = 0x01,
-    GVGA_MODE_TEXT= 0x02,
+    GVGA_MODE_TEXT = 0x02,
     GVGA_MODE_INTERLACED = 0x04,
     GVGA_MODE_DOUBLE_BUFFERED = 0x08,
 } GVgaMode;
 
-typedef struct GVga {
+typedef struct GVga
+{
     void *vga_mode;
     uint32_t frameBytes;
     uint16_t height;
@@ -63,15 +67,22 @@ typedef struct GVga {
     uint16_t cols;
 } GVga;
 
-extern GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bool interlaced, void *userData);
-extern void gvga_start(GVga *gvga);
-extern void gvga_setPalette(GVga* gvga, GVgaColor *palette, unsigned intstart, unsigned intcount);
-extern void gvga_setBorderColors(GVga *gvga, GVgaColor top, GVgaColor bottom, GVgaColor left, GVgaColor right);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    extern GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bool interlaced, void *userData);
+    extern void gvga_start(GVga *gvga);
+    extern void gvga_setPalette(GVga *gvga, GVgaColor *palette, unsigned intstart, unsigned intcount);
+    extern void gvga_setBorderColors(GVga *gvga, GVgaColor top, GVgaColor bottom, GVgaColor left, GVgaColor right);
 
-extern GVga *gvga_destroy(GVga *gvga);
-extern void gvga_stop(GVga *gvga);
-extern void gvga_sync(GVga *gvga);
-extern void gvga_swap(GVga *gvga, bool copy);
+    extern GVga *gvga_destroy(GVga *gvga);
+    extern void gvga_stop(GVga *gvga);
+    extern void gvga_sync(GVga *gvga);
+    extern void gvga_swap(GVga *gvga, bool copy);
 
-extern void gvga_text(GVga *gvga, int row, int col, char *text, uint16_t color);
-extern void gvga_char(GVga *gvga, int row, int col, unsigned char c, uint16_t color);
+    extern void gvga_text(GVga *gvga, int row, int col, char *text, uint16_t color);
+    extern void gvga_char(GVga *gvga, int row, int col, unsigned char c, uint16_t color);
+#ifdef __cplusplus
+}
+#endif
