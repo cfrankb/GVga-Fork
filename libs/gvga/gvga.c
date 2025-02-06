@@ -180,6 +180,7 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
     {
         frameBytes /= 8;
     }
+    printf("frameBytes: %lu\n", frameBytes);
     gvga->showFrame = gcalloc(frameBytes, 1);
     if (gvga->showFrame == NULL)
     {
@@ -187,6 +188,7 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
         printf("Out of memory - showFrame\n");
     }
 
+    printf("double buffer: %s\n", doubleBuffer ? "true" : "false");
     gvga->drawFrame = gvga->showFrame;
     if (doubleBuffer)
     {
@@ -200,6 +202,7 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
     gvga->scanningMutex = &_gvga_mutex;
     mutex_init(gvga->scanningMutex);
 
+    printf("colors: %u\n", gvga->colors);
     gvga->palette = gcalloc(gvga->colors, sizeof(GVgaColor));
     if (gvga->palette == NULL)
     {

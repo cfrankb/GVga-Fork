@@ -26,6 +26,8 @@ extern "C"
     extern void gfx_text(GVga *gvga, uint16_t x, uint16_t y, char *text, uint16_t pen);
     extern Gfx *gfx_1bpp;
     extern Gfx *gfx_2bpp;
+    extern Gfx *gfx_4bpp;
+    extern Gfx *gfx_8bpp;
 
 #ifdef __cplusplus
 }

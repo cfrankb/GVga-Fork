@@ -17,7 +17,15 @@ include_directories(
 
 target_sources(${PROJECT} PUBLIC
     src/main.cpp
-    src/data.s
+    src/data.cpp
+    src/game.cpp
+    src/map.cpp
+    src/maparch.cpp
+    src/tilesdata.cpp
+    src/actor.cpp
+    src/animator.cpp
+    src/engine.cpp
+    src/draft.cpp
 )
 
 # Example include
@@ -40,6 +48,7 @@ PICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS=700
 
 add_subdirectory($ENV{GVGA_HOME}/libs ${CMAKE_BINARY_DIR}/libgvga)
 set_property(SOURCE src/data.s APPEND PROPERTY COMPILE_OPTIONS "-I" "${CMAKE_SOURCE_DIR}/data")
+set_property(TARGET ${PROJECT} APPEND_STRING PROPERTY LINK_FLAGS "-Wl,--print-memory-usage")
 
 
 target_link_libraries(${PROJECT} PRIVATE
