@@ -31,7 +31,7 @@ public:
         NO_ANIMZ = 255,
         TILE_OFFSET = TILE_SIZE * TILE_SIZE,
         CONFIG_WIDTH = 320,
-        CONFIG_HEIGHT = 240,
+        CONFIG_HEIGHT = 200,
         BLACK = 0,
         WHITE = 1,
         YELLOW = 2,

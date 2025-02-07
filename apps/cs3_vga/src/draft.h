@@ -16,7 +16,6 @@ public:
     CDraft(int width, int height);
     ~CDraft() {};
     void drawTile(uint16_t x, uint16_t y, uint8_t *tile, bool alpha = false) const;
-    void drawTile32(uint16_t x, uint16_t y, uint8_t *tile) const;
     void fill(const uint16_t color) const;
     void drawFont(const int x, const int y, const char *s, uint8_t color) const;
     void drawRect(const Rect &rect, const uint8_t color, const bool fill = true) const;

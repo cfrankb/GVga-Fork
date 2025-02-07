@@ -61,7 +61,6 @@ uint16_t rgb888torgb555(const uint8_t *rgb888Pixel)
 size_t setPalette(GVga *gvga)
 {
 	const size_t colorCount = sizeof(tiles_pal) / sizeof(uint32_t);
-	printf("tiles.pal: %u colors", colorCount);
 	uint16_t palette[colorCount];
 	for (size_t i = 0; i < colorCount; ++i)
 	{
@@ -72,27 +71,17 @@ size_t setPalette(GVga *gvga)
 	return colorCount;
 }
 
-void drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile, bool compr)
+void drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile)
 {
 	auto ptr = gvga->drawFrame + gvga->rowBytes * baseY + baseX;
 	Decoder decoder;
 	decoder.start(tile);
-
 	for (int y = 0; y < TILE_SIZE; ++y)
 	{
 		for (int x = 0; x < TILE_SIZE; ++x)
 		{
-			if (compr)
-			{
-				ptr[x] = decoder.get();
-			}
-			else
-			{
-				ptr[x] = tile[x];
-			}
+			ptr[x] = decoder.get();
 		}
-		if (!compr)
-			tile += TILE_SIZE;
 		ptr += gvga->rowBytes;
 	}
 }
@@ -102,41 +91,22 @@ void fillScreen(GVga *gvga)
 	const int cols = width / TILE_SIZE;
 	const int rows = height / TILE_SIZE;
 
-	typedef struct
-	{
-		uint8_t *tiledata;
-		bool compr;
-	} tileset_t;
-
-	const tileset_t tilesets[]{
-		{tiles_mcz, true},
-		{annie_mcz, true},
-		{animz_mcz, true},
+	uint8_t *tilesets[]{
+		tiles_mcz,
+		annie_mcz,
+		animz_mcz,
 	};
 
 	const int set = rand() % 3;
-	const tileset_t &cur = tilesets[set];
-	uint8_t *tiledata = cur.tiledata;
-	const int tileCount = cur.compr ? tiledata[0] + (tiledata[1] << 8) : 32;
-	// printf("tileCount:%d\n", tileCount);
-	// printf("tileID :%d at offset %.4x\n", tileID, offset);
+	uint8_t *tiledata = tilesets[set];
+	const int tileCount = tiledata[0] + (tiledata[1] << 8);
 	for (int y = 0; y < rows; ++y)
 	{
 		for (int x = 0; x < cols; ++x)
 		{
-			const int tileID = rand() % tileCount;
-			uint8_t *p = tiledata + 2 * (tileID + 1);
-			uint16_t offset = p[0] + (p[1] << 8);
-			uint8_t *tile = nullptr;
-			if (cur.compr)
-			{
-				tile = tiledata + offset;
-			}
-			else
-			{
-				tile = tiledata + tileID * TILE_BYTES;
-			}
-			drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile, cur.compr);
+			uint8_t tileID = rand() % tileCount;
+			auto tile = Decoder::data(tiledata, tileID);
+			drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile);
 		}
 	}
 }
@@ -146,21 +116,20 @@ int main()
 	stdio_init_all();
 	srand(time(NULL));
 	sleep_ms(1000);
-	printf("\nGVga test\n");
 
 	for (int i = 15; i; --i)
 	{
-		sleep_ms(250);
-		printf("loop %d\n", i);
-		sleep_ms(250);
+		sleep_ms(500);
+		printf("%d\n", i);
 	}
 	_init_led();
 
 	GVga *gvga = gvga_init(width, height, bits, doubleBuffer, interlaced, NULL);
 	gvga_start(gvga);
 	setPalette(gvga);
-	while (true)
+	while (false)
 	{
+		_blink_led(100);
 		fillScreen(gvga);
 		sleep_ms(1000);
 	}

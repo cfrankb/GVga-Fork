@@ -6,6 +6,10 @@ include($ENV{PICO_EXTRAS_PATH}/external/pico_extras_import.cmake)
 
 set(PROJECT hello_world)
 project(${PROJECT})
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+
 pico_sdk_init()
 
 add_compile_options(-Wall)
@@ -20,7 +24,6 @@ target_sources(${PROJECT} PUBLIC
     src/data.cpp
     src/game.cpp
     src/map.cpp
-    #src/maparch.cpp
     src/tilesdata.cpp
     src/actor.cpp
     src/animator.cpp

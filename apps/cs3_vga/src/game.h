@@ -3,13 +3,6 @@
 #include <vector>
 #include "actor.h"
 #include "map.h"
-// #include "maparch.h"
-
-typedef struct
-{
-    uint32_t *list;
-    uint32_t size;
-} IndexVector;
 
 class CMap;
 class CEngine;
@@ -46,7 +39,6 @@ public:
     int diamonds();
     int health();
     int level();
-    bool loadMapIndex();
     std::string m_mapFile;
     int godModeTimer();
     int playerSpeed();
@@ -75,7 +67,6 @@ private:
     CGame();
 
 protected:
-    IndexVector m_arch;
     int m_lives = 0;
     int m_health = 0;
     int m_level = 0;
@@ -86,9 +77,7 @@ protected:
     int32_t m_godModeTimer = 0;
     int32_t m_extraSpeedTimer = 0;
     static uint8_t m_keys[6];
-
     CActor m_player;
-    void clearAttr(uint8_t attr);
 
     // monsters
     enum
@@ -110,5 +99,6 @@ protected:
     void addHealth(int hp);
     void addPoints(int points);
     void addLife();
-    bool indexFromMemory(uint8_t *ptr, IndexVector &index);
+    void clearAttr(uint8_t attr);
+    bool decodeMap(int i);
 };

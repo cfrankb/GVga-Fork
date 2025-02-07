@@ -6,9 +6,10 @@
 #include "data.h"
 #include "sprtypes.h"
 #include "tilesdata.h"
+#include "decoder.h"
 
 CGame *g_game = nullptr;
-CMap map(30, 30);
+CMap map(10, 10);
 uint8_t CGame::m_keys[MAX_KEYS];
 
 CGame::CGame()
@@ -19,7 +20,6 @@ CGame::CGame()
     m_health = 0;
     m_lives = DEFAULT_LIVES;
     m_score = 0;
-    memset(&m_arch, 0, sizeof(m_arch));
 }
 
 CGame::~CGame()
@@ -129,17 +129,51 @@ void CGame::restartLevel()
     loadLevel(true);
 }
 
+bool CGame::decodeMap(int i)
+{
+    // find map data and size
+    printf("count:%d\n", Decoder::size(levels_mapz));
+    printf("offset:0x%.4x\n", Decoder::offset(levels_mapz, i));
+
+    printf("i=%d\n", i);
+    uint8_t *data = Decoder::data(levels_mapz, i);
+    uint16_t len = data[0];
+    uint16_t hei = data[1];
+    CMap map;
+    printf("map len:%d [0x%.2x] hei:%d [0x%.2x]\n", len, len, hei, hei);
+    map.resize(len, hei, true);
+
+    // start decoding map
+    uint8_t *dest = map.row(0);
+    Decoder decoder;
+    decoder.start(data + 2);
+    for (uint16_t i = 0; i < len * hei; ++i)
+    {
+        // decoding map
+        *dest++ = decoder.get();
+    }
+
+    // copy map attributs
+    data += decoder.idx() + 2;
+    uint16_t count = data[0] + (data[1] << 8);
+    printf("attrs count:%d [0x%.4x]\n", count, count);
+    data += 2;
+    while (count--)
+    {
+        map.set(data[0], data[1], data[2]);
+        data += 3;
+    }
+    return true;
+}
+
 bool CGame::loadLevel(bool restart)
 {
     printf("loading level: %d ...\n", m_level + 1);
     setMode(restart ? MODE_RESTART : MODE_INTRO);
 
-    int i = m_level % m_arch.size;
-    if (!map.fromMemory(levels_mapz + m_arch.list[i]))
-    {
-        printf("failed to load level\n");
-        return false;
-    }
+    // extract map
+    int i = m_level % Decoder::size(levels_mapz);
+    // decodeMap(i);
 
     printf("level loaded\n");
 
@@ -548,17 +582,6 @@ CActor &CGame::getMonster(int i)
     return m_monsters[i];
 }
 
-bool CGame::loadMapIndex()
-{
-    printf("getting mapIndex\n");
-    if (!indexFromMemory(levels_mapz, m_arch))
-    {
-        printf("failed to get mapIndex from mapArch\n");
-        return false;
-    }
-    return true;
-}
-
 CGame *CGame::getGame()
 {
     if (!g_game)
@@ -566,41 +589,4 @@ CGame *CGame::getGame()
         g_game = new CGame();
     }
     return g_game;
-}
-
-bool CGame::indexFromMemory(uint8_t *ptr, IndexVector &index)
-{
-    // check signature
-    uint32_t sig = *reinterpret_cast<uint32_t *>(ptr);
-    if (memcmp(&sig, "MAAZ", sizeof(sig)) != 0)
-    {
-        return false;
-    }
-    printf("maparch signature match\n");
-    if (index.list)
-    {
-        delete[] index.list;
-        index.list = nullptr;
-    }
-    uint16_t count = *reinterpret_cast<decltype(count) *>(ptr + 6);
-    printf("count: %d\n", count);
-    uint32_t indexBase = *reinterpret_cast<decltype(indexBase) *>(ptr + 8);
-    printf("index base: 0x%.8lx\n", indexBase);
-    index.list = new uint32_t[count];
-    index.size = count;
-    for (uint16_t i = 0; i < count; ++i)
-    {
-        union
-        {
-            uint32_t idx;
-            uint8_t idxRaw[sizeof(uint32_t)];
-        };
-        for (size_t j = 0; j < sizeof(uint32_t); ++j)
-        {
-            idxRaw[j] = ptr[indexBase + i * 4 + j];
-        }
-        printf("index level %d: found at %.4lx\n", i + 1, idx);
-        index.list[i] = idx;
-    }
-    return true;
 }

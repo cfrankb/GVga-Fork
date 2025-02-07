@@ -10,6 +10,7 @@
 #include "animator.h"
 #include "data.h"
 #include "gfx.h"
+#include "decoder.h"
 
 static CDraft draft(CEngine::CONFIG_WIDTH, CEngine::TILE_SIZE);
 
@@ -26,10 +27,7 @@ CEngine *CEngine::getEngine()
 
 CEngine::CEngine()
 {
-    if (!init())
-    {
-        printf("loading mapIndex failed\n");
-    }
+    init();
 }
 
 CEngine::~CEngine()
@@ -86,7 +84,7 @@ void CEngine::drawKeys(const CDraft &display, const int y)
         uint8_t k = keys[i];
         if (k)
         {
-            display.drawTile(x, y, tiles_mcz + k * TILE_OFFSET, true);
+            display.drawTile(x, y, Decoder::data(tiles_mcz, k), true);
             x -= TILE_SIZE;
         }
     }
@@ -110,7 +108,7 @@ void CEngine::drawScreen(GVga *gvga)
     int count;
     m_game->getMonsters(monsters, count);
 
-    uint8_t *tiledata = nullptr;
+    uint8_t *tile = nullptr;
     for (int y = 0; y < rows; ++y)
     {
         if (y == rows - 1)
@@ -139,7 +137,8 @@ void CEngine::drawScreen(GVga *gvga)
             if (i == TILES_ANNIE2)
             {
                 const int frame = player.getAim() * PLAYER_FRAMES + m_playerFrameOffset;
-                tiledata = annie_mcz + TILE_OFFSET * frame;
+                tile = Decoder::data(annie_mcz, frame);
+                // annie_mcz + TILE_OFFSET * frame;
             }
             else
             {
@@ -148,17 +147,16 @@ void CEngine::drawScreen(GVga *gvga)
                     i = TILES_BLANK;
                 }
                 j = m_animator->at(i);
-                tiledata = (j == NO_ANIMZ)
-                               ? tiles_mcz + i * TILE_OFFSET
-                               : animz_mcz + j * TILE_OFFSET;
+                //                tile = (j == NO_ANIMZ) ? Decoder::data(tiles_mcz, i) : Decoder::data(animz_mcz, j);
+                tile = Decoder::data(tiles_mcz, i);
             }
             if (y == 0)
             {
-                draft.drawTile32(x * TILE_SIZE, 0, tiledata);
+                draft.drawTile(x * TILE_SIZE, 0, tile);
             }
             else
             {
-                drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tiledata);
+                drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile);
             }
         }
         /*
@@ -213,7 +211,7 @@ bool CEngine::init()
 {
     m_game = CGame::getGame();
     m_animator = new CAnimator();
-    return m_game->loadMapIndex();
+    return true;
 }
 
 mutex_t *CEngine::mutex()
@@ -288,12 +286,14 @@ void CEngine::drawBuffer(GVga *gvga, uint16_t baseX, uint16_t baseY, uint8_t *pi
 
 void CEngine::drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile)
 {
+    Decoder decoder;
+    decoder.start(tile);
     auto ptr = gvga->drawFrame + gvga->rowBytes * baseY + baseX;
     for (int y = 0; y < 16; ++y)
     {
         for (int x = 0; x < 16; ++x)
         {
-            ptr[x] = tile[x];
+            ptr[x] = decoder.get(); // tile[x];
         }
         tile += 16;
         ptr += gvga->rowBytes;

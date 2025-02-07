@@ -1,10 +1,8 @@
-#include "draft.h"
-#include "data.h"
 #include <algorithm>
 #include <cstdio>
-
-// extern uint8_t bitfont_bin;
-static const char TAG[]{"draft"};
+#include "draft.h"
+#include "data.h"
+#include "decoder.h"
 
 CDraft::CDraft(int width, int height)
 {
@@ -14,33 +12,18 @@ CDraft::CDraft(int width, int height)
     m_height = height;
 };
 
-void CDraft::drawTile32(uint16_t x, uint16_t y, uint8_t *tile) const
-{
-    // ESP_LOGI(TAG, "Drawing tile at: %d %d %p", x, y, tile);
-    uint8_t *o = m_buf + x + y * m_width;
-    uint32_t *p32 = reinterpret_cast<uint32_t *>(tile);
-    for (int yy = 0; yy < TILE_SIZE; ++yy)
-    {
-        uint32_t *d32 = reinterpret_cast<uint32_t *>(o);
-        d32[0] = p32[0];
-        d32[1] = p32[1];
-        d32[2] = p32[2];
-        d32[3] = p32[3];
-        o += m_width;
-        p32 += 4;
-    }
-}
-
 void CDraft::drawTile(uint16_t x, uint16_t y, uint8_t *tile, bool alpha) const
 {
     // ESP_LOGI(TAG, "Drawing tile at: %d %d %p", x, y, tile);
+    Decoder decoder;
+    decoder.start(tile);
     uint8_t *d = m_buf + x + y * m_width;
-    int i = 0;
+    // int i = 0;
     for (int yy = 0; yy < TILE_SIZE; ++yy)
     {
         for (int xx = 0; xx < TILE_SIZE; ++xx)
         {
-            const auto pixel = tile[i++];
+            const auto pixel = decoder.get(); // tile[i++];
             if (pixel || !alpha)
             {
                 d[xx + yy * m_width] = pixel;

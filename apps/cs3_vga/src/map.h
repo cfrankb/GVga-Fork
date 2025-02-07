@@ -33,6 +33,7 @@ public:
     int count(uint8_t tileId);
     void clear(uint8_t ch = 0);
     uint8_t getAttr(const uint8_t x, const uint8_t y);
+    AttrMap &attrs() { return m_attrs; }
     void setAttr(const uint8_t x, const uint8_t y, const uint8_t a);
     int size();
     const char *lastError();

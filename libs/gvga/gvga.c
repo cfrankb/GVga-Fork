@@ -133,7 +133,6 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
 
     if (gvga->height > FRAME_HEIGHT)
     {
-        printf("Invalid height\n");
         _errorScreen(gvga, "Invalid height");
     }
     // scale vga width
@@ -150,7 +149,6 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
     }
     else
     {
-        _errorScreen(gvga, "Invalid width");
         printf("Invalid width\n");
     }
 
@@ -172,7 +170,6 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
         break;
     default:
         _errorScreen(gvga, "Invalid bits");
-        printf("Invalid bits\n");
     }
     uint pixelsPerByte = 8 / gvga->bits;
     uint32_t frameBytes = width * height / pixelsPerByte;
@@ -185,7 +182,6 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
     if (gvga->showFrame == NULL)
     {
         _errorScreen(gvga, "Out of memory - showFrame");
-        printf("Out of memory - showFrame\n");
     }
 
     printf("double buffer: %s\n", doubleBuffer ? "true" : "false");
@@ -196,7 +192,6 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
         if (gvga->drawFrame == NULL)
         {
             _errorScreen(gvga, "Out of memory - drawFrame");
-            printf("Out of memory - drawFrame\n");
         }
     }
     gvga->scanningMutex = &_gvga_mutex;
@@ -207,7 +202,6 @@ GVga *gvga_init(uint16_t width, uint16_t height, int bits, bool doubleBuffer, bo
     if (gvga->palette == NULL)
     {
         _errorScreen(gvga, "Out of memory - palette");
-        printf("Out of memory - palette\n");
     }
 
     switch (gvga->bits)
