@@ -7,13 +7,14 @@
 CDraft::CDraft(int width, int height)
 {
     // ESP_LOGI(TAG, "Building Display Wrapper");
-    m_buf = new uint8_t[width * height];
+    // m_buf = new uint8_t[width * height];
     m_width = width;
     m_height = height;
 };
 
 void CDraft::drawTile(uint16_t x, uint16_t y, uint8_t *tile, bool alpha) const
 {
+    return;
     // ESP_LOGI(TAG, "Drawing tile at: %d %d %p", x, y, tile);
     Decoder decoder;
     decoder.start(tile);
@@ -34,6 +35,7 @@ void CDraft::drawTile(uint16_t x, uint16_t y, uint8_t *tile, bool alpha) const
 
 void CDraft::fill(const uint16_t color) const
 {
+    return;
     printf("Fill Buffer %d x %d\n", m_width, m_height);
     for (int i = 0; i < m_width * m_height; ++i)
     {
@@ -43,6 +45,7 @@ void CDraft::fill(const uint16_t color) const
 
 void CDraft::drawFont(const int x, const int y, const char *s, uint8_t color) const
 {
+    return;
     // ESP_LOGI(TAG, "Draw Font at (%d,%d): %s", x, y, s);
     uint8_t *font = bitfont_bin;
     for (int j = 0; s[j]; ++j)
@@ -64,6 +67,7 @@ void CDraft::drawFont(const int x, const int y, const char *s, uint8_t color) co
 
 void CDraft::drawRect(const Rect &rect, const uint8_t color, const bool fill) const
 {
+    return;
     uint8_t *buf = m_buf + rect.x + rect.y * m_width;
     if (fill)
     {

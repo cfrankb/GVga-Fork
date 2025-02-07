@@ -139,7 +139,6 @@ bool CGame::decodeMap(int i)
     uint8_t *data = Decoder::data(levels_mapz, i);
     uint16_t len = data[0];
     uint16_t hei = data[1];
-    CMap map;
     printf("map len:%d [0x%.2x] hei:%d [0x%.2x]\n", len, len, hei, hei);
     map.resize(len, hei, true);
 
@@ -173,9 +172,9 @@ bool CGame::loadLevel(bool restart)
 
     // extract map
     int i = m_level % Decoder::size(levels_mapz);
-    // decodeMap(i);
+    decodeMap(i);
 
-    printf("level loaded\n");
+    // printf("level loaded\n");
 
     Pos pos = map.findFirst(TILES_ANNIE2);
     printf("Player at: %d %d\n", pos.x, pos.y);

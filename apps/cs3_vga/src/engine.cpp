@@ -134,7 +134,7 @@ void CEngine::drawScreen(GVga *gvga)
         {
             int j;
             int i = y + my >= map.hei() ? TILES_BLANK : map.at(x + mx, y + my);
-            if (i == TILES_ANNIE2)
+            if (false) // i == TILES_ANNIE2)
             {
                 const int frame = player.getAim() * PLAYER_FRAMES + m_playerFrameOffset;
                 tile = Decoder::data(annie_mcz, frame);
@@ -156,7 +156,7 @@ void CEngine::drawScreen(GVga *gvga)
             }
             else
             {
-                drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile);
+                drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile, false);
             }
         }
         /*
@@ -284,18 +284,27 @@ void CEngine::drawBuffer(GVga *gvga, uint16_t baseX, uint16_t baseY, uint8_t *pi
     }
 }
 
-void CEngine::drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile)
+void CEngine::drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile, bool flip)
 {
     Decoder decoder;
     decoder.start(tile);
     auto ptr = gvga->drawFrame + gvga->rowBytes * baseY + baseX;
-    for (int y = 0; y < 16; ++y)
+    for (int y = 0; y < TILE_SIZE; ++y)
     {
-        for (int x = 0; x < 16; ++x)
+        if (flip)
         {
-            ptr[x] = decoder.get(); // tile[x];
+            for (int x = TILE_SIZE - 1; x >= 0; --x)
+            {
+                ptr[x] = decoder.get();
+            }
         }
-        tile += 16;
+        else
+        {
+            for (int x = 0; x < TILE_SIZE; ++x)
+            {
+                ptr[x] = decoder.get();
+            }
+        }
         ptr += gvga->rowBytes;
     }
 }

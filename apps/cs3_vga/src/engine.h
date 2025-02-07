@@ -51,5 +51,5 @@ protected:
     bool init();
     void drawKeys(const CDraft &display, const int y);
     void drawBuffer(GVga *gvga, uint16_t orgX, uint16_t orgY, uint8_t *pixels, int len, int hei);
-    void drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile);
+    void drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile, bool flip);
 };

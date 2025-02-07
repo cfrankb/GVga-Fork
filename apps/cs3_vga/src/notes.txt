@@ -1,37 +1,7 @@
+minicom -b 115200 -o -D /dev/ttyACM0
+make && build/mcxz -d data.ini -eX888P
+
+https://lorenz-ruprecht.at/docu/pico-sdk/1.4.0/html/group__mutex.html#details
+
 // Including binary data in ELF binary
 // https://forums.raspberrypi.com/viewtopic.php?t=360419
-
-
-.rodata
-Memory region         Used Size  Region Size  %age Used
-           FLASH:      150628 B         2 MB      7.18%
-             RAM:      159956 B       256 KB     61.02%
-       SCRATCH_X:          2 KB         4 KB     50.00%
-       SCRATCH_Y:           0 B         4 KB      0.00%
-
-Memory region         Used Size  Region Size  %age Used
-           FLASH:       50708 B         2 MB      2.42%
-             RAM:       60036 B       256 KB     22.90%
-       SCRATCH_X:          2 KB         4 KB     50.00%
-       SCRATCH_Y:           0 B         4 KB      0.00%
-[100%] Built target hello_world
-
-
-Memory region         Used Size  Region Size  %age Used
-           FLASH:       88024 B         2 MB      4.20%
-             RAM:       97316 B       256 KB     37.12%
-       SCRATCH_X:          2 KB         4 KB     50.00%
-       SCRATCH_Y:           0 B         4 KB      0.00%
-[100%] Built target hello_world
-
-Memory region         Used Size  Region Size  %age Used
-           FLASH:      150488 B         2 MB      7.18%
-             RAM:      159780 B       256 KB     60.95%
-       SCRATCH_X:          2 KB         4 KB     50.00%
-       SCRATCH_Y:           0 B         4 KB      0.00%
-
-Memory region         Used Size  Region Size  %age Used
-           FLASH:       86076 B         2 MB      4.10%
-             RAM:       95364 B       256 KB     36.38%
-       SCRATCH_X:          2 KB         4 KB     50.00%
-       SCRATCH_Y:           0 B         4 KB      0.00%       
