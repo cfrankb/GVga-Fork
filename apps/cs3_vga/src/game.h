@@ -1,8 +1,15 @@
 #pragma once
 #include <stdint.h>
+#include <vector>
 #include "actor.h"
 #include "map.h"
-#include "maparch.h"
+// #include "maparch.h"
+
+typedef struct
+{
+    uint32_t *list;
+    uint32_t size;
+} IndexVector;
 
 class CMap;
 class CEngine;
@@ -103,4 +110,5 @@ protected:
     void addHealth(int hp);
     void addPoints(int points);
     void addLife();
+    bool indexFromMemory(uint8_t *ptr, IndexVector &index);
 };

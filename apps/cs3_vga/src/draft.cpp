@@ -1,8 +1,9 @@
 #include "draft.h"
+#include "data.h"
 #include <algorithm>
 #include <cstdio>
 
-extern uint8_t bitfont_bin;
+// extern uint8_t bitfont_bin;
 static const char TAG[]{"draft"};
 
 CDraft::CDraft(int width, int height)
@@ -60,7 +61,7 @@ void CDraft::fill(const uint16_t color) const
 void CDraft::drawFont(const int x, const int y, const char *s, uint8_t color) const
 {
     // ESP_LOGI(TAG, "Draw Font at (%d,%d): %s", x, y, s);
-    uint8_t *font = &bitfont_bin;
+    uint8_t *font = bitfont_bin;
     for (int j = 0; s[j]; ++j)
     {
         int u = s[j] < 127 ? std::max(s[j] - ' ', 0) : 0;

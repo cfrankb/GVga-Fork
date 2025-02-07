@@ -19,6 +19,7 @@ CGame::CGame()
     m_health = 0;
     m_lives = DEFAULT_LIVES;
     m_score = 0;
+    memset(&m_arch, 0, sizeof(m_arch));
 }
 
 CGame::~CGame()
@@ -133,8 +134,8 @@ bool CGame::loadLevel(bool restart)
     printf("loading level: %d ...\n", m_level + 1);
     setMode(restart ? MODE_RESTART : MODE_INTRO);
 
-    int i = m_level % m_arch.size();
-    if (!map.fromMemory(levels_mapz + m_arch.at(i)))
+    int i = m_level % m_arch.size;
+    if (!map.fromMemory(levels_mapz + m_arch.list[i]))
     {
         printf("failed to load level\n");
         return false;
@@ -550,7 +551,7 @@ CActor &CGame::getMonster(int i)
 bool CGame::loadMapIndex()
 {
     printf("getting mapIndex\n");
-    if (!CMapArch::indexFromMemory(levels_mapz, m_arch))
+    if (!indexFromMemory(levels_mapz, m_arch))
     {
         printf("failed to get mapIndex from mapArch\n");
         return false;
@@ -565,4 +566,41 @@ CGame *CGame::getGame()
         g_game = new CGame();
     }
     return g_game;
+}
+
+bool CGame::indexFromMemory(uint8_t *ptr, IndexVector &index)
+{
+    // check signature
+    uint32_t sig = *reinterpret_cast<uint32_t *>(ptr);
+    if (memcmp(&sig, "MAAZ", sizeof(sig)) != 0)
+    {
+        return false;
+    }
+    printf("maparch signature match\n");
+    if (index.list)
+    {
+        delete[] index.list;
+        index.list = nullptr;
+    }
+    uint16_t count = *reinterpret_cast<decltype(count) *>(ptr + 6);
+    printf("count: %d\n", count);
+    uint32_t indexBase = *reinterpret_cast<decltype(indexBase) *>(ptr + 8);
+    printf("index base: 0x%.8lx\n", indexBase);
+    index.list = new uint32_t[count];
+    index.size = count;
+    for (uint16_t i = 0; i < count; ++i)
+    {
+        union
+        {
+            uint32_t idx;
+            uint8_t idxRaw[sizeof(uint32_t)];
+        };
+        for (size_t j = 0; j < sizeof(uint32_t); ++j)
+        {
+            idxRaw[j] = ptr[indexBase + i * 4 + j];
+        }
+        printf("index level %d: found at %.4lx\n", i + 1, idx);
+        index.list[i] = idx;
+    }
+    return true;
 }

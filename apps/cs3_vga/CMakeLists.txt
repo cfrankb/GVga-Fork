@@ -20,7 +20,7 @@ target_sources(${PROJECT} PUBLIC
     src/data.cpp
     src/game.cpp
     src/map.cpp
-    src/maparch.cpp
+    #src/maparch.cpp
     src/tilesdata.cpp
     src/actor.cpp
     src/animator.cpp

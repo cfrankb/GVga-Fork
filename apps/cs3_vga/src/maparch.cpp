@@ -218,12 +218,12 @@ bool CMapArch::indexFromFile(const char *filename, IndexVector &index)
         fseek(sfile, hdr.offset, SEEK_SET);
         uint32_t *indexPtr = new uint32_t[hdr.count];
         fread(indexPtr, 4 * hdr.count, 1, sfile);
-        index.clear();
-        for (int i = 0; i < hdr.count; ++i)
+        if (index.list)
         {
-            index.push_back(indexPtr[i]);
+            delete[] index.list;
+            index.list = nullptr;
         }
-        delete[] indexPtr;
+        index.list = indexPtr;
         fclose(sfile);
     }
     return sfile != nullptr;
@@ -237,13 +237,31 @@ bool CMapArch::indexFromMemory(uint8_t *ptr, IndexVector &index)
     {
         return false;
     }
-    index.clear();
+    printf("maparch signature match\n");
+    if (index.list)
+    {
+        delete[] index.list;
+        index.list = nullptr;
+    }
     uint16_t count = *reinterpret_cast<decltype(count) *>(ptr + 6);
+    printf("count: %d\n", count);
     uint32_t indexBase = *reinterpret_cast<decltype(indexBase) *>(ptr + 8);
+    printf("index base: 0x%.8lx\n", indexBase);
+    index.list = new uint32_t[count];
+    index.size = count;
     for (uint16_t i = 0; i < count; ++i)
     {
-        long idx = *reinterpret_cast<long *>(ptr + indexBase + i * 4);
-        index.push_back(idx);
+        union
+        {
+            uint32_t idx;
+            uint8_t idxRaw[sizeof(uint32_t)];
+        };
+        for (size_t j = 0; j < sizeof(uint32_t); ++j)
+        {
+            idxRaw[j] = ptr[indexBase + i * 4 + j];
+        }
+        printf("index level %d: found at %.4lx\n", i + 1, idx);
+        index.list[i] = idx;
     }
     return true;
 }

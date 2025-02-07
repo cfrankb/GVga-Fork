@@ -1,13 +1,12 @@
 #pragma once
 
 #include "pico/mutex.h"
+#include "gvga.h"
 
 class CGame;
 class CAnimator;
 class CDraft;
 class IJoystick;
-
-class VGA;
 
 class CEngine
 {
@@ -17,9 +16,9 @@ public:
 
     mutex_t *mutex();
     CGame &game();
-    void drawScreen(VGA *vga);
-    void drawLevelIntro(VGA *vga);
-    void mainLoop(const int ticks);
+    void drawScreen(GVga *gvga);
+    void drawLevelIntro(GVga *gvga);
+    void mainLoop(const uint32_t ticks);
     void attach(IJoystick *gamepad);
 
     enum
@@ -51,4 +50,6 @@ protected:
     CGame *m_game = nullptr;
     bool init();
     void drawKeys(const CDraft &display, const int y);
+    void drawBuffer(GVga *gvga, uint16_t orgX, uint16_t orgY, uint8_t *pixels, int len, int hei);
+    void drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile);
 };

@@ -2,6 +2,7 @@
 
 import glob
 import binascii
+from os.path import basename
 
 CHUNK_SIZE = 32
 
@@ -10,25 +11,24 @@ def chunks(l, n):
         yield l[i:i+n]
 
 
-symbols = ['#include <stdint.h>', '', '#pragma once', '']
+defs = ['#include <stdint.h>', '', '#pragma once', '', ]
 
-with open('../src/data.cpp', 'wb') as tfile:
+with open('src/data.cpp', 'wb') as tfile:
     i =0
     tfile.write('#include <cstdint>\n'.encode('utf-8'))
-    for fname in glob.glob('*'):
+    for fname in glob.glob('data/*'):
         if fname.endswith('.py'):
             continue
-        symbol = fname.replace('.', "_")
-        print(fname)
+        if fname.find('/old') != -1:
+            continue
         sfile = open(fname, 'rb')
         data = sfile.read()
-        typex = 'uint8_t'
+        symbol = basename(fname).replace('.rle', '').replace('.', "_")
+        print(fname)
         if fname.endswith('.mcz'):
             # strip header from mcz file
             data = data[12:]        
-        #elif fname.endswith('.pal'):
-        #    typex = 'uint32_t'
-        symbols.append(f'extern {typex} {symbol}[{len(data)}];')
+        defs.append(f'extern uint8_t {symbol}[{len(data)}];')
         sfile.close()
         tfile.write(f'uint8_t {symbol}[]={{\n'.encode('utf-8'))
         for line in chunks(binascii.b2a_hex(data), CHUNK_SIZE):
@@ -40,7 +40,8 @@ with open('../src/data.cpp', 'wb') as tfile:
         tfile.write('};\n\n'.encode('utf-8'))
         i += 1
 
+
 #// extern uint8_t tiles_mcz;
-with open('../src/data.h', 'wb') as tfile:
-    t = '\n'.join(symbols)
+with open('src/data.h', 'wb') as tfile:
+    t = '\n'.join(defs)
     tfile.write(t.encode('utf-8'))

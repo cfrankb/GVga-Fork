@@ -85,7 +85,7 @@ const TileDef & getTileDef(int i);
 #define TILES_POT            0x3d
 #define TILES_POT_2          0x3e
 #define TILES_JAR1           0x3f
-#define TILES_WATERMEL       0x40
+#define TILES_WATERMELON     0x40
 #define TILES_BOULDER        0x41
 #define TILES_BOULDER_2      0x42
 #define TILES_MAGICBOX       0x43
@@ -99,7 +99,7 @@ const TileDef & getTileDef(int i);
 #define TILES_VIALS_3        0x4b
 #define TILES_POIRE          0x4c
 #define TILES_CLOVER         0x4d
-#define TILES_PUMPKIN        0x4e
+#define TILES_CHERRY         0x4e
 #define TILES_FLOWERS        0x4f
 #define TILES_FLOWERS_2      0x50
 #define TILES_HEARTDOOR      0x51
@@ -134,9 +134,5 @@ const TileDef & getTileDef(int i);
 #define TILES_YAHOO          0x6e
 #define TILES_YIGA           0x6f
 #define TILES_YELKILLER      0x70
-#define TILES_WHTEWORM       0x71
-#define TILES_ETURTLE        0x72
-#define TILES_DRAGO          0x73
-#define TILES_LEFTBIRD       0x74
 
 #endif

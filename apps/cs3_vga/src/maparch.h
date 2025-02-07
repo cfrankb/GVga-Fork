@@ -6,7 +6,11 @@
 
 class CMap;
 
-typedef std::vector<long> IndexVector;
+typedef struct
+{
+    uint32_t *list;
+    uint32_t size;
+} IndexVector;
 
 class CMapArch
 {
