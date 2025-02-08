@@ -4,11 +4,20 @@ set(FAMILY rp2040)
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 include($ENV{PICO_EXTRAS_PATH}/external/pico_extras_import.cmake)
 
-set(PROJECT hello_world)
+#execute_process(COMMAND git describe --tags --dirty --always OUTPUT_VARIABLE GIT_DESCRIBE OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+set(PROJECT rp2040_gvga_cs3)
 project(${PROJECT})
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+set(COMMON_COMPILE_OPTIONS
+  -Wall -Wextra -Wno-unused-parameter -Wstack-usage=800 # some enable extra warnings
+  -fasynchronous-unwind-tables        # backtrace support # -fno-omit-frame-pointer
+)
+#set(PICO_BOARD pico_w)                # we only support the pico w
+#set(PICO_NO_GC_SECTIONS 1)            # don't remove unused functions at link time (so a custom prog can call them)
+
 
 pico_sdk_init()
 
@@ -21,7 +30,6 @@ include_directories(
 
 target_sources(${PROJECT} PUBLIC
     src/main.cpp
-    src/data.cpp
     src/game.cpp
     src/map.cpp
     src/tilesdata.cpp
@@ -29,6 +37,7 @@ target_sources(${PROJECT} PUBLIC
     src/animator.cpp
     src/engine.cpp
     src/draft.cpp
+    src/debug.cpp
 )
 
 # Example include
@@ -58,6 +67,7 @@ target_link_libraries(${PROJECT} PRIVATE
         pico_multicore
         pico_stdlib
         pico_scanvideo_dpi
+        hardware_flash
         libgvga
 )
 

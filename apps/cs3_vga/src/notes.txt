@@ -5,3 +5,10 @@ https://lorenz-ruprecht.at/docu/pico-sdk/1.4.0/html/group__mutex.html#details
 
 // Including binary data in ELF binary
 // https://forums.raspberrypi.com/viewtopic.php?t=360419
+
+picotool load -v -t bin doom1.whx -o 0x10042000
+
+https://hackaday.com/2023/08/21/adding-mmio-ram-on-the-rp2040/
+
+free heap:174800
+free heap:97968

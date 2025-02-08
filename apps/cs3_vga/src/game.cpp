@@ -6,10 +6,11 @@
 #include "data.h"
 #include "sprtypes.h"
 #include "tilesdata.h"
-#include "decoder.h"
+#include "engine.h"
+#include "debug.h"
 
 CGame *g_game = nullptr;
-CMap map(10, 10);
+CMap map(64, 64);
 uint8_t CGame::m_keys[MAX_KEYS];
 
 CGame::CGame()
@@ -111,7 +112,7 @@ void CGame::consume()
 
 void CGame::nextLevel()
 {
-    printf("nextLevel\n");
+    // printf("nextLevel\n");
     m_score += 500 + m_health;
     ++m_level;
     ++m_levelCount;
@@ -129,38 +130,61 @@ void CGame::restartLevel()
     loadLevel(true);
 }
 
+#define ALIGNMENT 256
+#define MASK (ALIGNMENT - 1)
+
 bool CGame::decodeMap(int i)
 {
     // find map data and size
-    printf("count:%d\n", Decoder::size(levels_mapz));
-    printf("offset:0x%.4x\n", Decoder::offset(levels_mapz, i));
-
-    printf("i=%d\n", i);
-    uint8_t *data = Decoder::data(levels_mapz, i);
-    uint16_t len = data[0];
-    uint16_t hei = data[1];
-    printf("map len:%d [0x%.2x] hei:%d [0x%.2x]\n", len, len, hei, hei);
-    map.resize(len, hei, true);
-
-    // start decoding map
-    uint8_t *dest = map.row(0);
-    Decoder decoder;
-    decoder.start(data + 2);
-    for (uint16_t i = 0; i < len * hei; ++i)
+    const uint32_t *index = reinterpret_cast<const uint32_t *>(CEngine::dataPtr(LEVELS_MAPZ_INDEX));
+    struct MapInfo
     {
-        // decoding map
-        *dest++ = decoder.get();
+        uint32_t offset;
+        uint16_t len;
+        uint16_t hei;
+    };
+    const MapInfo *mapInfo = reinterpret_cast<const MapInfo *>(&index[1]);
+    // printf("level i=%d\n", i);
+    // printf("count:%ld\n", index[0]);
+    // printf("mapInfo at 0x%p\n", mapInfo);
+    // print_buf(reinterpret_cast<const uint8_t *>(mapInfo), 256);
+    // printf("offset:0x%.4lx\n", mapInfo[i].offset);
+    //  printf("map >> len:%d [0x%.2x] hei:%d [0x%.2x]\n", mapInfo[i].len, mapInfo[i].len, mapInfo[i].hei, mapInfo[i].hei);
+    map.resize(mapInfo[i].len, mapInfo[i].hei, true);
+
+    // copying map to ram
+    uint8_t *dest = map.row(0);
+    // printf("dest: %p\n", dest);
+    const uint16_t mapSize = mapInfo[i].len * mapInfo[i].hei;
+    // printf("mapSize: %u\n", mapSize);
+    const uint8_t *mapData = CEngine::dataPtr(mapInfo[i].offset + i);
+    for (uint16_t i = 0; i < mapSize; ++i)
+    {
+        dest[i] = mapData[i];
+    }
+    print_buf(dest, 256);
+
+    // printf("got here\n");
+
+    // padding for aligment
+    uint32_t offset = mapInfo[i].offset + mapSize;
+    if (offset & MASK)
+    {
+        offset += ALIGNMENT - (offset & MASK);
     }
 
+    printf("attr offset: %.8lx\n", offset);
+
     // copy map attributs
-    data += decoder.idx() + 2;
+    uint16_t j = 0;
+    auto data = CEngine::dataPtr(offset);
     uint16_t count = data[0] + (data[1] << 8);
     printf("attrs count:%d [0x%.4x]\n", count, count);
-    data += 2;
+    j += 2;
     while (count--)
     {
-        map.set(data[0], data[1], data[2]);
-        data += 3;
+        map.set(data[j], data[j + 1], data[j + 2]);
+        j += 3;
     }
     return true;
 }
@@ -170,11 +194,10 @@ bool CGame::loadLevel(bool restart)
     printf("loading level: %d ...\n", m_level + 1);
     setMode(restart ? MODE_RESTART : MODE_INTRO);
 
-    // extract map
-    int i = m_level % Decoder::size(levels_mapz);
-    decodeMap(i);
-
-    // printf("level loaded\n");
+    //  extract map
+    const uint32_t *index = reinterpret_cast<const uint32_t *>(CEngine::dataPtr(LEVELS_MAPZ_INDEX));
+    const uint32_t mapCount = index[0];
+    decodeMap(m_level % mapCount);
 
     Pos pos = map.findFirst(TILES_ANNIE2);
     printf("Player at: %d %d\n", pos.x, pos.y);

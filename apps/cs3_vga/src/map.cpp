@@ -20,6 +20,10 @@ CMap::CMap(uint16_t len, uint16_t hei, uint8_t t)
         m_size = m_len * m_hei;
         memset(m_map, t, m_size * sizeof(m_map[0]));
     }
+    else
+    {
+        printf("map is null. out of memory\n");
+    }
 };
 
 CMap::~CMap()
@@ -81,6 +85,7 @@ bool CMap::resize(uint16_t len, uint16_t hei, bool fast)
     {
         if (len * hei > m_size)
         {
+            printf("resizing map\n");
             forget();
             m_map = new uint8_t[len * hei];
             if (m_map == nullptr)

@@ -1,31 +1,33 @@
 #include <stdio.h>
 #include <time.h>
+#include <malloc.h>
+#include "hardware/flash.h"
+#include "pico/stdlib.h"
 #include "gvga.h"
 #include "gfx.h"
-#include "pico/stdlib.h"
 #include "ls7447.h"
 #include "data.h"
 #include "tilesdata.h"
 #include "game.h"
 #include "engine.h"
 #include "decoder.h"
+#include "debug.h"
 
 /**
  * simple hello world program demonstrating the GVga library
  */
 
-#define TILE_SIZE 16
-#define TILE_BYTES (TILE_SIZE * TILE_SIZE)
-#define TILES_MAX TILES_YELKILLER
+// #define FLASH_TARGET_OFFSET (256 * 1024)
+// #define FLASH_TARGET_OFFSET 0x42000
 
-const uint BOARD_LED_PIN = 25; // Example: GPIO 25, which is connected to the onboard LED
+#define BOARD_LED_PIN 25 // Example: GPIO 25, which is connected to the onboard LED
 int _state = 1;
 uint32_t _msLast;
 
-const int width = 320;			 // screen width
-const int height = 200;			 // screen height
-const int bits = 8;				 // bits per pixel (256 color palette)
-const bool doubleBuffer = false; // not enough memory for that
+const int width = CEngine::CONFIG_WIDTH;   // screen width
+const int height = CEngine::CONFIG_HEIGHT; // screen height
+const int bits = 8;						   // bits per pixel (256 color palette)
+const bool doubleBuffer = false;		   // not enough memory for that
 const bool interlaced = false;
 
 static void _init_led()
@@ -60,27 +62,33 @@ uint16_t rgb888torgb555(const uint8_t *rgb888Pixel)
 
 size_t setPalette(GVga *gvga)
 {
-	const size_t colorCount = sizeof(tiles_pal) / sizeof(uint32_t);
-	uint16_t palette[colorCount];
+	// printf("setPaletteX\n");
+	const size_t colorCount = TILES_PAL_SIZE / sizeof(uint32_t);
+	uint16_t *palette = new uint16_t[colorCount];
+	auto tiles_pal = CEngine::dataPtr(TILES_PAL_OFFSET);
+	// print_buf(tiles_pal, 256);
 	for (size_t i = 0; i < colorCount; ++i)
 	{
-		auto rgba = reinterpret_cast<uint32_t *>(tiles_pal)[i];
-		palette[i] = rgb888torgb555(reinterpret_cast<uint8_t *>(&rgba));
+		uint8_t rgba[4];
+		rgba[0] = tiles_pal[i * sizeof(uint32_t)];
+		rgba[1] = tiles_pal[i * sizeof(uint32_t) + 1];
+		rgba[2] = tiles_pal[i * sizeof(uint32_t) + 2];
+		rgba[3] = tiles_pal[i * sizeof(uint32_t) + 3];
+		palette[i] = rgb888torgb555(rgba);
 	}
 	gvga_setPalette(gvga, reinterpret_cast<GVgaColor *>(palette), 0, colorCount);
+	delete[] palette;
 	return colorCount;
 }
 
-void drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile)
+void drawTile(GVga *gvga, int baseX, int baseY, const uint8_t *tile)
 {
 	auto ptr = gvga->drawFrame + gvga->rowBytes * baseY + baseX;
-	Decoder decoder;
-	decoder.start(tile);
-	for (int y = 0; y < TILE_SIZE; ++y)
+	for (int y = 0; y < CEngine::TILE_SIZE; ++y)
 	{
-		for (int x = 0; x < TILE_SIZE; ++x)
+		for (int x = 0; x < CEngine::TILE_SIZE; ++x)
 		{
-			ptr[x] = decoder.get();
+			ptr[x] = tile[x + y * CEngine::TILE_SIZE];
 		}
 		ptr += gvga->rowBytes;
 	}
@@ -88,27 +96,47 @@ void drawTile(GVga *gvga, int baseX, int baseY, uint8_t *tile)
 
 void fillScreen(GVga *gvga)
 {
-	const int cols = width / TILE_SIZE;
-	const int rows = height / TILE_SIZE;
+	const int cols = width / CEngine::TILE_SIZE;
+	const int rows = height / CEngine::TILE_SIZE;
 
-	uint8_t *tilesets[]{
-		tiles_mcz,
-		annie_mcz,
-		animz_mcz,
+	struct tileset_t
+	{
+		uint32_t offset;
+		uint32_t size;
+	};
+
+	tileset_t tilesets[] = {
+		{ANIMZ_MCZ_OFFSET, ANIMZ_MCZ_SIZE},
+		{ANNIE_MCZ_OFFSET, ANNIE_MCZ_SIZE},
+		{TILES_MCZ_OFFSET, TILES_MCZ_SIZE},
 	};
 
 	const int set = rand() % 3;
-	uint8_t *tiledata = tilesets[set];
-	const int tileCount = tiledata[0] + (tiledata[1] << 8);
+	const uint8_t *tiledata = CEngine::dataPtr(tilesets[set].offset); // reinterpret_cast<const uint8_t *>(XIP_BASE + FLASH_TARGET_OFFSET + tilesets[set].offset);
+	const int tileCount = tilesets[set].size / CEngine::TILE_OFFSET;
 	for (int y = 0; y < rows; ++y)
 	{
 		for (int x = 0; x < cols; ++x)
 		{
 			uint8_t tileID = rand() % tileCount;
-			auto tile = Decoder::data(tiledata, tileID);
-			drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile);
+			const uint8_t *tile = tiledata + tileID * CEngine::TILE_OFFSET;
+			drawTile(gvga, x * CEngine::TILE_SIZE, y * CEngine::TILE_SIZE, tile);
 		}
 	}
+}
+
+uint32_t getTotalHeap(void)
+{
+	extern char __StackLimit, __bss_end__;
+
+	return &__StackLimit - &__bss_end__;
+}
+
+uint32_t getFreeHeap(void)
+{
+	struct mallinfo m = mallinfo();
+
+	return getTotalHeap() - m.uordblks;
 }
 
 int main()
@@ -124,9 +152,23 @@ int main()
 	}
 	_init_led();
 
+	printf("free heap:%ld\n", getFreeHeap());
+
+	const uint8_t *flash_target_contents = CEngine::dataPtr(0);
+	// printf("XIP_BASE: 0x%.8x\n", XIP_BASE);
+	print_buf(flash_target_contents, FLASH_PAGE_SIZE);
+	printf("free heap:%ld\n", getFreeHeap());
+
+	while (false)
+	{
+		_blink_led(100);
+	}
 	GVga *gvga = gvga_init(width, height, bits, doubleBuffer, interlaced, NULL);
 	gvga_start(gvga);
 	setPalette(gvga);
+
+	printf("free heap:%ld\n", getFreeHeap());
+
 	while (false)
 	{
 		_blink_led(100);
@@ -137,7 +179,6 @@ int main()
 	CGame &game = *CGame::getGame();
 	CEngine &engine = *CEngine::getEngine();
 	game.loadLevel(false);
-
 	uint32_t ticks = 0;
 
 	while (true)
