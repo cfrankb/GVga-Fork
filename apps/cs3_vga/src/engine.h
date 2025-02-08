@@ -22,7 +22,6 @@ public:
     void mainLoop(const uint32_t ticks);
     void attach(IJoystick *gamepad);
     static const uint8_t *dataPtr(const uint32_t offset);
-    static const uint8_t *data(const uint32_t offset);
 
     enum
     {
@@ -38,13 +37,13 @@ public:
         TILE_OFFSET = TILE_SIZE * TILE_SIZE,
         CONFIG_WIDTH = 320,
         CONFIG_HEIGHT = 240,
-        BLACK = 0,
-        WHITE = 1,
-        YELLOW = 2,
-        PURPLE = 3,
-        GRAY = 4,
-        LIGHTGRAY = 5,
-        LIME = 6
+        BLACK = 0x00,
+        WHITE = 0x1f,
+        YELLOW = 0x36,
+        PURPLE = 0x3a,
+        GRAY = 0x46,
+        LIGHTGRAY = 0x60,
+        LIME = 0x93
     };
 
 protected:

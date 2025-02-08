@@ -10,15 +10,7 @@
 #include "tilesdata.h"
 #include "game.h"
 #include "engine.h"
-#include "decoder.h"
 #include "debug.h"
-
-/**
- * simple hello world program demonstrating the GVga library
- */
-
-// #define FLASH_TARGET_OFFSET (256 * 1024)
-// #define FLASH_TARGET_OFFSET 0x42000
 
 #define BOARD_LED_PIN 25 // Example: GPIO 25, which is connected to the onboard LED
 int _state = 1;
@@ -62,11 +54,9 @@ uint16_t rgb888torgb555(const uint8_t *rgb888Pixel)
 
 size_t setPalette(GVga *gvga)
 {
-	// printf("setPaletteX\n");
 	const size_t colorCount = TILES_PAL_SIZE / sizeof(uint32_t);
 	uint16_t *palette = new uint16_t[colorCount];
 	auto tiles_pal = CEngine::dataPtr(TILES_PAL_OFFSET);
-	// print_buf(tiles_pal, 256);
 	for (size_t i = 0; i < colorCount; ++i)
 	{
 		uint8_t rgba[4];
@@ -112,7 +102,7 @@ void fillScreen(GVga *gvga)
 	};
 
 	const int set = rand() % 3;
-	const uint8_t *tiledata = CEngine::dataPtr(tilesets[set].offset); // reinterpret_cast<const uint8_t *>(XIP_BASE + FLASH_TARGET_OFFSET + tilesets[set].offset);
+	const uint8_t *tiledata = CEngine::dataPtr(tilesets[set].offset);
 	const int tileCount = tilesets[set].size / CEngine::TILE_OFFSET;
 	for (int y = 0; y < rows; ++y)
 	{
@@ -153,16 +143,6 @@ int main()
 	_init_led();
 
 	printf("free heap:%ld\n", getFreeHeap());
-
-	const uint8_t *flash_target_contents = CEngine::dataPtr(0);
-	// printf("XIP_BASE: 0x%.8x\n", XIP_BASE);
-	print_buf(flash_target_contents, FLASH_PAGE_SIZE);
-	printf("free heap:%ld\n", getFreeHeap());
-
-	while (false)
-	{
-		_blink_led(100);
-	}
 	GVga *gvga = gvga_init(width, height, bits, doubleBuffer, interlaced, NULL);
 	gvga_start(gvga);
 	setPalette(gvga);
@@ -203,7 +183,7 @@ int main()
 		case CGame::MODE_LEVEL:
 			engine.drawScreen(gvga);
 		}
-
+		sleep_ms(40);
 		engine.mainLoop(ticks);
 	}
 }

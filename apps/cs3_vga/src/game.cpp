@@ -144,27 +144,17 @@ bool CGame::decodeMap(int i)
         uint16_t hei;
     };
     const MapInfo *mapInfo = reinterpret_cast<const MapInfo *>(&index[1]);
-    // printf("level i=%d\n", i);
-    // printf("count:%ld\n", index[0]);
-    // printf("mapInfo at 0x%p\n", mapInfo);
-    // print_buf(reinterpret_cast<const uint8_t *>(mapInfo), 256);
-    // printf("offset:0x%.4lx\n", mapInfo[i].offset);
-    //  printf("map >> len:%d [0x%.2x] hei:%d [0x%.2x]\n", mapInfo[i].len, mapInfo[i].len, mapInfo[i].hei, mapInfo[i].hei);
     map.resize(mapInfo[i].len, mapInfo[i].hei, true);
 
     // copying map to ram
     uint8_t *dest = map.row(0);
-    // printf("dest: %p\n", dest);
     const uint16_t mapSize = mapInfo[i].len * mapInfo[i].hei;
-    // printf("mapSize: %u\n", mapSize);
     const uint8_t *mapData = CEngine::dataPtr(mapInfo[i].offset + i);
     for (uint16_t i = 0; i < mapSize; ++i)
     {
         dest[i] = mapData[i];
     }
-    print_buf(dest, 256);
-
-    // printf("got here\n");
+    // print_buf(dest, 256);
 
     // padding for aligment
     uint32_t offset = mapInfo[i].offset + mapSize;
@@ -172,8 +162,6 @@ bool CGame::decodeMap(int i)
     {
         offset += ALIGNMENT - (offset & MASK);
     }
-
-    printf("attr offset: %.8lx\n", offset);
 
     // copy map attributs
     uint16_t j = 0;

@@ -2,7 +2,6 @@
 #include <cstdio>
 #include "draft.h"
 #include "data.h"
-#include "decoder.h"
 #include "engine.h"
 
 CDraft::CDraft(int width, int height)
@@ -16,8 +15,6 @@ CDraft::CDraft(int width, int height)
 void CDraft::drawTile(uint16_t x, uint16_t y, const uint8_t *tile, bool alpha) const
 {
     // ESP_LOGI(TAG, "Drawing tile at: %d %d %p", x, y, tile);
-    // Decoder decoder;
-    // decoder.start(tile);
     uint8_t *d = m_buf + x + y * m_width;
     int i = 0;
     for (int yy = 0; yy < TILE_SIZE; ++yy)

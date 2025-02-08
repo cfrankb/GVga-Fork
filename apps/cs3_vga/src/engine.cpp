@@ -10,7 +10,6 @@
 #include "animator.h"
 #include "data.h"
 #include "gfx.h"
-#include "decoder.h"
 
 CDraft draft(CEngine::CONFIG_WIDTH, CEngine::TILE_SIZE);
 
@@ -45,9 +44,7 @@ CGame &CEngine::game()
 
 void CEngine::drawLevelIntro(GVga *gvga)
 {
-    printf("Draw Level Intro\n");
-
-    char t[32];
+    char t[20];
     switch (m_game->mode())
     {
     case CGame::MODE_INTRO:
@@ -56,7 +53,7 @@ void CEngine::drawLevelIntro(GVga *gvga)
     case CGame::MODE_RESTART:
         if (m_game->lives() == 1)
         {
-            strcpy(t, "ONE LIFE LEFT");
+            strcpy(t, "LAST LIFE !");
             break;
         }
         sprintf(t, "LIVES LEFT %.2d", m_game->lives());
@@ -65,10 +62,11 @@ void CEngine::drawLevelIntro(GVga *gvga)
         strcpy(t, "GAME OVER");
     };
 
-    int x = (CONFIG_WIDTH - strlen(t) * FONT_SIZE) / 2;
-    int y = (CONFIG_HEIGHT - FONT_SIZE) / 2;
+    uint16_t x = (CONFIG_WIDTH - strlen(t) * FONT_SIZE) / 2;
+    uint16_t y = (CONFIG_HEIGHT - FONT_SIZE) / 2;
     gfx_clear(gvga, BLACK);
     draft.fill(BLACK);
+    printf("Draw Level Intro at: %d, %d\n", x, y);
     draft.drawFont(x, 0, t, WHITE);
     drawBuffer(gvga, 0, y, draft.buf(), draft.width(), FONT_SIZE);
 }
@@ -137,9 +135,13 @@ void CEngine::drawScreen(GVga *gvga)
                 const int frame = player.getAim() * PLAYER_FRAMES + m_playerFrameOffset;
                 auto tile = dataPtr(ANNIE_MCZ_OFFSET + frame * TILE_OFFSET);
                 if (y == 0)
+                {
                     draft.drawTile(x * TILE_SIZE, 0, tile);
+                }
                 else
+                {
                     drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile, false);
+                }
             }
             else
             {
@@ -150,11 +152,14 @@ void CEngine::drawScreen(GVga *gvga)
                 j = m_animator->at(i);
                 auto tile = j == NO_ANIMZ ? dataPtr(TILES_MCZ_OFFSET + i * TILE_OFFSET)
                                           : dataPtr(ANIMZ_MCZ_OFFSET + j * TILE_OFFSET);
-                drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile, false);
                 if (y == 0)
+                {
                     draft.drawTile(x * TILE_SIZE, 0, tile);
+                }
                 else
+                {
                     drawTile(gvga, x * TILE_SIZE, y * TILE_SIZE, tile, false);
+                }
             }
         }
 
@@ -187,16 +192,16 @@ void CEngine::drawScreen(GVga *gvga)
         if (y == 0)
         {
             char tmp[16];
-            int bx = 0;
-            int offsetY = 0;
-            sprintf(tmp, "%.8d ", m_game->score());
+            uint16_t bx = 0;
+            uint16_t offsetY = 0;
+            uint16_t ssize = sprintf(tmp, "%.8d ", m_game->score());
             draft.drawFont(0, offsetY, tmp, WHITE);
 
-            bx += strlen(tmp);
-            sprintf(tmp, "DIAMONDS %.2d ", m_game->diamonds());
+            bx += ssize;
+            ssize = sprintf(tmp, "DIAMONDS %.2d ", m_game->diamonds());
             draft.drawFont(bx * FONT_SIZE, offsetY, tmp, YELLOW);
 
-            bx += strlen(tmp);
+            bx += ssize;
             sprintf(tmp, "LIVES %.2d ", m_game->lives());
             draft.drawFont(bx * FONT_SIZE, offsetY, tmp, PURPLE);
             drawBuffer(gvga, 0, 0, draft.buf(), draft.width(), draft.height());
