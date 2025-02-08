@@ -89,7 +89,6 @@ void CEngine::drawKeys(const CDraft &display, const int y)
 
 void CEngine::drawScreen(GVga *gvga)
 {
-    // ESP_LOGI(TAG, "Starting drawscreen");
     mutex_enter_blocking(&g_mutex);
     CMap &map = m_game->getMap();
     CActor &player = m_game->player();
@@ -105,7 +104,7 @@ void CEngine::drawScreen(GVga *gvga)
     int count;
     m_game->getMonsters(monsters, count);
 
-    for (int y = 0; y < rows; ++y)
+    for (uint16_t y = 0; y < rows; ++y)
     {
         if (y == rows - 1)
         {
@@ -126,10 +125,10 @@ void CEngine::drawScreen(GVga *gvga)
             continue;
         }
 
-        for (int x = 0; x < cols; ++x)
+        for (uint16_t x = 0; x < cols; ++x)
         {
-            int j;
-            int i = y + my >= map.hei() ? TILES_BLANK : map.at(x + mx, y + my);
+            uint16_t j;
+            uint16_t i = y + my >= map.hei() ? TILES_BLANK : map.at(x + mx, y + my);
             if (i == TILES_ANNIE2)
             {
                 const int frame = player.getAim() * PLAYER_FRAMES + m_playerFrameOffset;
@@ -163,8 +162,8 @@ void CEngine::drawScreen(GVga *gvga)
             }
         }
 
-        const int offset = m_animator->offset() & 7;
-        for (int i = 0; i < count; ++i)
+        const uint16_t offset = m_animator->offset() & 7;
+        for (uint16_t i = 0; i < count; ++i)
         {
             const CActor &monster = monsters[i];
             if (monster.within(mx, my + y, mx + cols, my + y + 1))
@@ -175,9 +174,8 @@ void CEngine::drawScreen(GVga *gvga)
                     continue;
                 }
                 // special case animations
-                const int xx = monster.getX() - mx;
+                const int16_t xx = monster.getX() - mx;
                 auto tile = dataPtr(ANIMZ_MCZ_OFFSET + (monster.getAim() * 8 + ANIMZ_INSECT1 + offset) * TILE_OFFSET);
-                // tiledata = reinterpret_cast<uint8_t *>(&animz_mcz) + (monster.getAim() * 8 + ANIMZ_INSECT1 + offset) * TILE_OFFSET;
                 if (y == 0)
                 {
                     draft.drawTile(xx * TILE_SIZE, 0, tile);
@@ -236,6 +234,19 @@ void CEngine::mainLoop(const uint32_t ticks)
     {
         game.managePlayer(joyState);
     }
+    else
+    {
+        game.killPlayer();
+        if (game.isGameOver())
+        {
+            game.setMode(CGame::MODE_GAMEOVER);
+        }
+        else
+        {
+            game.loadLevel(true);
+            // game.setMode(CGame::MODE_RESTART);
+        }
+    }
 
     if (ticks % PLAYER_SPEED == 0)
     {
@@ -287,10 +298,8 @@ void CEngine::drawBuffer(GVga *gvga, uint16_t baseX, uint16_t baseY, uint8_t *pi
     }
 }
 
-void CEngine::drawTile(GVga *gvga, int baseX, int baseY, const uint8_t *tile, bool flip)
+void CEngine::drawTile(GVga *gvga, uint16_t baseX, uint16_t baseY, const uint8_t *tile, bool flip)
 {
-    // Decoder decoder;
-    // decoder.start(tile);
     int i = 0;
     auto ptr = gvga->drawFrame + gvga->rowBytes * baseY + baseX;
     for (int y = 0; y < TILE_SIZE; ++y)

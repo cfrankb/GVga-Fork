@@ -37,6 +37,9 @@ public:
         TILE_OFFSET = TILE_SIZE * TILE_SIZE,
         CONFIG_WIDTH = 320,
         CONFIG_HEIGHT = 240,
+        GVGA_BITS = 8,
+        DOUBLEBUFFER = false,
+        INTERLACE = false,
         BLACK = 0x00,
         WHITE = 0x1f,
         YELLOW = 0x36,
@@ -56,5 +59,5 @@ protected:
     bool init();
     void drawKeys(const CDraft &display, const int y);
     void drawBuffer(GVga *gvga, uint16_t orgX, uint16_t orgY, uint8_t *pixels, int len, int hei);
-    void drawTile(GVga *gvga, int baseX, int baseY, const uint8_t *tile, bool flip);
+    void drawTile(GVga *gvga, uint16_t baseX, uint16_t baseY, const uint8_t *tile, bool flip);
 };

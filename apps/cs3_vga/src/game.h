@@ -15,8 +15,8 @@ public:
 
     bool loadLevel(bool restart);
     bool move(int dir);
-    void manageMonsters(int ticks);
-    void managePlayer(const uint16_t joyState);
+    void manageMonsters(uint32_t ticks);
+    void managePlayer(const uint32_t joyState);
     static Pos translate(const Pos &p, int aim);
     void consume();
     static bool hasKey(uint8_t c);
@@ -27,7 +27,7 @@ public:
     void nextLevel();
     void restartLevel();
     void restartGame();
-    void setMode(int mode);
+    void setMode(uint8_t mode);
     int mode() const;
     bool isPlayerDead();
     void killPlayer();
@@ -61,6 +61,9 @@ public:
         DEFAULT_PLAYER_SPEED = 3,
         FAST_PLAYER_SPEED = 2,
         MAX_KEYS = 6,
+        SPEED_COUNT = 9,
+        ALIGNMENT = 4,
+        MASK = ALIGNMENT - 1,
     };
 
 private:
@@ -95,7 +98,7 @@ protected:
     int m_monsterMax;
     bool findMonsters();
     int addMonster(const CActor actor);
-    int findMonsterAt(int x, int y);
+    int findMonsterAt(uint16_t x, uint16_t y);
     void addHealth(int hp);
     void addPoints(int points);
     void addLife();

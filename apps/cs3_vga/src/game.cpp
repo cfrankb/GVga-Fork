@@ -130,9 +130,6 @@ void CGame::restartLevel()
     loadLevel(true);
 }
 
-#define ALIGNMENT 256
-#define MASK (ALIGNMENT - 1)
-
 bool CGame::decodeMap(int i)
 {
     // find map data and size
@@ -154,7 +151,6 @@ bool CGame::decodeMap(int i)
     {
         dest[i] = mapData[i];
     }
-    // print_buf(dest, 256);
 
     // padding for aligment
     uint32_t offset = mapInfo[i].offset + mapSize;
@@ -171,7 +167,7 @@ bool CGame::decodeMap(int i)
     j += 2;
     while (count--)
     {
-        map.set(data[j], data[j + 1], data[j + 2]);
+        map.setAttr(data[j], data[j + 1], data[j + 2]);
         j += 3;
     }
     return true;
@@ -201,9 +197,9 @@ bool CGame::loadLevel(bool restart)
 bool CGame::findMonsters()
 {
     m_monsterCount = 0;
-    for (int y = 0; y < map.hei(); ++y)
+    for (uint16_t y = 0; y < map.hei(); ++y)
     {
-        for (int x = 0; x < map.len(); ++x)
+        for (uint16_t x = 0; x < map.len(); ++x)
         {
             uint8_t c = map.at(x, y);
             const TileDef &def = getTileDef(c);
@@ -233,9 +229,9 @@ int CGame::addMonster(const CActor actor)
     return m_monsterCount;
 }
 
-int CGame::findMonsterAt(int x, int y)
+int CGame::findMonsterAt(uint16_t x, uint16_t y)
 {
-    for (int i = 0; i < m_monsterCount; ++i)
+    for (uint16_t i = 0; i < m_monsterCount; ++i)
     {
         const CActor &actor = m_monsters[i];
         if (actor.getX() == x && actor.getY() == y)
@@ -246,11 +242,10 @@ int CGame::findMonsterAt(int x, int y)
     return -1;
 }
 
-void CGame::manageMonsters(int ticks)
+void CGame::manageMonsters(uint32_t ticks)
 {
-    const int speedCount = 9;
-    bool speeds[speedCount];
-    for (uint32_t i = 0; i < sizeof(speeds); ++i)
+    bool speeds[SPEED_COUNT];
+    for (uint16_t i = 0; i < SPEED_COUNT; ++i)
     {
         speeds[i] = i ? (ticks % i) == 0 : true;
     }
@@ -258,7 +253,7 @@ void CGame::manageMonsters(int ticks)
     uint8_t dirs[] = {AIM_UP, AIM_DOWN, AIM_LEFT, AIM_RIGHT};
     std::vector<CActor> newMonsters;
 
-    for (int i = 0; i < m_monsterCount; ++i)
+    for (uint16_t i = 0; i < m_monsterCount; ++i)
     {
         CActor &actor = m_monsters[i];
         uint8_t cs = map.at(actor.getX(), actor.getY());
@@ -279,7 +274,7 @@ void CGame::manageMonsters(int ticks)
                 }
             }
 
-            int aim = actor.findNextDir();
+            uint8_t aim = actor.findNextDir();
             if (aim != AIM_NONE)
             {
                 actor.move(aim);
@@ -304,7 +299,7 @@ void CGame::manageMonsters(int ticks)
         }
         else if (def.type == TYPE_DRONE)
         {
-            int aim = actor.getAim();
+            uint8_t aim = actor.getAim();
             if (aim < AIM_LEFT)
             {
                 aim = AIM_LEFT;
@@ -363,7 +358,7 @@ void CGame::manageMonsters(int ticks)
     }
 }
 
-void CGame::managePlayer(const uint16_t joyState)
+void CGame::managePlayer(const uint32_t joyState)
 {
     m_godModeTimer = m_godModeTimer > 0 ? m_godModeTimer - 1 : 0;
     m_extraSpeedTimer = m_extraSpeedTimer > 0 ? m_extraSpeedTimer - 1 : 0;
@@ -425,7 +420,7 @@ Pos CGame::translate(const Pos &p, int aim)
 
 bool CGame::hasKey(uint8_t c)
 {
-    for (uint32_t i = 0; i < sizeof(m_keys); ++i)
+    for (uint16_t i = 0; i < sizeof(m_keys); ++i)
     {
         if (m_keys[i] == c)
         {
@@ -437,7 +432,7 @@ bool CGame::hasKey(uint8_t c)
 
 void CGame::addKey(uint8_t c)
 {
-    for (uint32_t i = 0; i < sizeof(m_keys); ++i)
+    for (uint16_t i = 0; i < sizeof(m_keys); ++i)
     {
         if (m_keys[i] == c)
         {
@@ -458,9 +453,9 @@ bool CGame::goalCount()
 
 void CGame::clearAttr(uint8_t attr)
 {
-    for (int y = 0; y < map.hei(); ++y)
+    for (uint16_t y = 0; y < map.hei(); ++y)
     {
-        for (int x = 0; x < map.len(); ++x)
+        for (uint16_t x = 0; x < map.len(); ++x)
         {
             const uint8_t tileAttr = map.getAttr(x, y);
             if (tileAttr == attr)
@@ -490,7 +485,7 @@ void CGame::addHealth(int hp)
     }
 }
 
-void CGame::setMode(int mode)
+void CGame::setMode(uint8_t mode)
 {
     m_mode = mode;
 }

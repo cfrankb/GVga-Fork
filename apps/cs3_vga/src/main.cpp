@@ -16,12 +16,6 @@
 int _state = 1;
 uint32_t _msLast;
 
-const int width = CEngine::CONFIG_WIDTH;   // screen width
-const int height = CEngine::CONFIG_HEIGHT; // screen height
-const int bits = 8;						   // bits per pixel (256 color palette)
-const bool doubleBuffer = false;		   // not enough memory for that
-const bool interlaced = false;
-
 static void _init_led()
 {
 	// heartbeat led
@@ -86,8 +80,8 @@ void drawTile(GVga *gvga, int baseX, int baseY, const uint8_t *tile)
 
 void fillScreen(GVga *gvga)
 {
-	const int cols = width / CEngine::TILE_SIZE;
-	const int rows = height / CEngine::TILE_SIZE;
+	const int cols = CEngine::CONFIG_WIDTH / CEngine::TILE_SIZE;
+	const int rows = CEngine::CONFIG_HEIGHT / CEngine::TILE_SIZE;
 
 	struct tileset_t
 	{
@@ -143,7 +137,12 @@ int main()
 	_init_led();
 
 	printf("free heap:%ld\n", getFreeHeap());
-	GVga *gvga = gvga_init(width, height, bits, doubleBuffer, interlaced, NULL);
+	GVga *gvga = gvga_init(CEngine::CONFIG_WIDTH,
+						   CEngine::CONFIG_HEIGHT,
+						   CEngine::GVGA_BITS,
+						   CEngine::DOUBLEBUFFER,
+						   CEngine::INTERLACE,
+						   nullptr);
 	gvga_start(gvga);
 	setPalette(gvga);
 
@@ -183,7 +182,7 @@ int main()
 		case CGame::MODE_LEVEL:
 			engine.drawScreen(gvga);
 		}
-		sleep_ms(40);
+		sleep_ms(1000 / 24);
 		engine.mainLoop(ticks);
 	}
 }

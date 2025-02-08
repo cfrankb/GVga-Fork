@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo picotool load -v -t bin data/cs3data.bin -o 0x10042000
+sudo picotool load -f -v -t bin data/gamedata.bin -o 0x10042000
