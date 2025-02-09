@@ -10,7 +10,7 @@ Current status is alpha. 90% of the core mechanic has been implemented.
 
 ## RP2040 VGA (GVGA library)
 
-![Image](techdocs/images/20241221_100753-crop.jpg "icon")
+![Image](techdocs/images/20250208_135759-crop.jpg "icon")
 
 Gameplay: https://www.youtube.com/watch?v=SPQwWkzFRpU
 
@@ -30,7 +30,7 @@ This project is based in part on: https://github.com/drfrancintosh/GVga
 
 ```Shell
 git clone https://github.com/cfrankb/GVga-Fork.git
-cd app/cs3_vga
+cd GVga-Fork/app/cs3_vga
 ./vmake.sh
 ./flashdata.sh
 ./update.sh
@@ -43,11 +43,10 @@ cd app/cs3_vga
 An adaptor is needed to communicate with the VGA Hardware.
 
 
-![Image](techdocs/images/20250202_211146-crop.jpg "icon")
+![Image](techdocs/images/20250209_015201-crop.jpg "icon")
 
 
-kicad / gerber: [cfrankb/ESP32-S3-VGA-ADAPTOR](https://github.com/cfrankb/ESP32-S3-VGA-ADAPTOR)
-
+kicad / gerber: TBA
 
 ## Gamepad
 
@@ -57,15 +56,15 @@ kicad / gerber: [cfrankb/ESP32-S3-VGA-ADAPTOR](https://github.com/cfrankb/ESP32-
 
 | Aim   | GPIO Pin |
 | ----- | -------- |
-| UP    | 38       |
-| DOWN  | 35       |
-| LEFT  | 47       |
-| RIGHT | 48       |
+| UP    | 18       |
+| DOWN  | 19       |
+| LEFT  | 20       |
+| RIGHT | 21       |
 
 ```
-CGameController gamepad(GPIO_NUM_38, GPIO_NUM_35, GPIO_NUM_47, GPIO_NUM_48);
+CGameController gamepad(18, 19, 20, 21);
 engine->attach(&gamepad);
 ```
 
-The above configuration is for the ESP32S3. Pin out will vary per model.
+The above configuration is for my RP2040. Pin out will vary per model.
 
