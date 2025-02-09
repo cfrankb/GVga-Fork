@@ -9,6 +9,8 @@
 #include "engine.h"
 #include "debug.h"
 
+#define TILES_MAX TILES_YELKILLER
+
 CGame *g_game = nullptr;
 CMap map(64, 64);
 uint8_t CGame::m_keys[MAX_KEYS];
@@ -48,6 +50,14 @@ bool CGame::move(int aim)
         m_player.move(aim);
         consume();
         return true;
+    }
+    else
+    {
+        uint8_t c = map.at(m_player.getX(), m_player.getY());
+        if (c >= TILES_MAX)
+        {
+            printf("invalid tile: %.2x at %d, %d\n", c, m_player.getX(), m_player.getY());
+        }
     }
 
     return false;
@@ -257,6 +267,13 @@ void CGame::manageMonsters(uint32_t ticks)
     {
         CActor &actor = m_monsters[i];
         uint8_t cs = map.at(actor.getX(), actor.getY());
+        if (cs >= TILES_MAX)
+        {
+            map.set(actor.getX(), actor.getY(), TILES_TOMB);
+            printf("invalid tile %.2x at %d,%d\n", cs, actor.getX(), actor.getY());
+            continue;
+        }
+
         const TileDef &def = getTileDef(cs);
         if (!speeds[def.speed])
         {

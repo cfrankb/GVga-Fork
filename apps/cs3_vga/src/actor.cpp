@@ -108,7 +108,7 @@ void CActor::setXY(const Pos &pos)
     m_y = pos.y;
 }
 
-int CActor::findNextDir()
+uint8_t CActor::findNextDir()
 {
     int i = AIM_COUNT - 1;
     while (i >= 0)

@@ -2,7 +2,7 @@
 
 Colors are encoded as unsigned 16bits integer (B5G6R5).
 
-The five (5) lowest bits are red and in accending order of brigtness. The next six (6) bits are green and the last five (5) bits are blue.
+The five (5) lowest bits are red and in accending order of brigtness. The next six (5) bits are green and the last five (5) bits are blue.
 
 
 # Hardware
@@ -42,7 +42,7 @@ Create a resistor ladder wire as follow. Connect all the pins of the same color 
 | 2        | red   | 2k       |
 | 3        | red   | 1k       |
 | 4        | red   | 512R     |
-| 6        | green | 8k       |
+| 6        | green | 8k       | 2       |
 | 7        | green | 4k       |
 | 8        | green | 2k       |
 | 9        | green | 1k       |

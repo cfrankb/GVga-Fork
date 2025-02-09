@@ -18,8 +18,6 @@ auto_init_mutex(g_mutex);
 CEngine *g_engine = nullptr;
 CEngine *CEngine::getEngine()
 {
-    // auto &def = getTileDef(TILES_INSECT1);
-    // printf("INSECT1: speed %d\n", def.speed);
     if (!g_engine)
     {
         g_engine = new CEngine();

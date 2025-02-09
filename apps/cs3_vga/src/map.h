@@ -18,9 +18,9 @@ class CMap
 public:
     CMap(uint16_t len = 0, uint16_t hei = 0, uint8_t t = 0);
     ~CMap();
-    uint8_t &at(int x, int y);
-    uint8_t *row(int y);
-    void set(int x, int y, uint8_t t);
+    uint8_t &at(uint8_t x, uint8_t y);
+    uint8_t *row(uint8_t y);
+    void set(uint8_t x, uint8_t y, uint8_t t);
     void forget();
     uint16_t len() const;
     uint16_t hei() const;

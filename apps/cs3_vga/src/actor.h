@@ -8,7 +8,7 @@ enum JoyAim
     AIM_DOWN = 1,
     AIM_LEFT = 2,
     AIM_RIGHT = 3,
-    AIM_NONE = -1,
+    AIM_NONE = 0xff,
     AIM_COUNT = 4
 };
 
@@ -29,7 +29,7 @@ public:
     void setXY(const Pos &pos);
     uint8_t getAim() const;
     void setAim(const uint8_t aim);
-    int findNextDir();
+    uint8_t findNextDir();
     bool isPlayerThere(uint8_t aim);
     uint8_t tileAt(uint8_t aim);
     void setType(const uint8_t type);

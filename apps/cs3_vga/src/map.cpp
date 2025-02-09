@@ -31,7 +31,7 @@ CMap::~CMap()
     forget();
 };
 
-uint8_t &CMap::at(int x, int y)
+uint8_t &CMap::at(uint8_t x, uint8_t y)
 {
     if (x >= m_len)
     {
@@ -41,16 +41,26 @@ uint8_t &CMap::at(int x, int y)
     {
         printf("y [%d] greater than m_hei\n", y);
     }
+
     return *(m_map + x + y * m_len);
 }
 
-uint8_t *CMap::row(int y)
+uint8_t *CMap::row(uint8_t y)
 {
     return m_map + y * m_len;
 }
 
-void CMap::set(int x, int y, uint8_t t)
+void CMap::set(uint8_t x, uint8_t y, uint8_t t)
 {
+    if (x >= m_len)
+    {
+        printf("x [%d] greater than m_len\n", x);
+    }
+    if (y >= m_hei)
+    {
+        printf("y [%d] greater than m_hei\n", y);
+    }
+
     at(x, y) = t;
 }
 
@@ -82,12 +92,10 @@ bool CMap::resize(uint16_t len, uint16_t hei, bool fast)
 {
     len = std::min(len, MAX_SIZE);
     hei = std::min(hei, MAX_SIZE);
-    // printf("len:%d hei:%d fast:%d\n", len, hei, fast);
     if (fast)
     {
         if (len * hei > m_size)
         {
-            printf("resizing map\n");
             forget();
             m_map = new uint8_t[len * hei];
             if (m_map == nullptr)
