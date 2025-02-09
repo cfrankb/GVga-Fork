@@ -68,11 +68,12 @@ void CMap::forget()
     m_attrs.clear();
 }
 
-int CMap::len() const
+uint16_t CMap::len() const
 {
     return m_len;
 }
-int CMap::hei() const
+
+uint16_t CMap::hei() const
 {
     return m_hei;
 }
@@ -81,6 +82,7 @@ bool CMap::resize(uint16_t len, uint16_t hei, bool fast)
 {
     len = std::min(len, MAX_SIZE);
     hei = std::min(hei, MAX_SIZE);
+    // printf("len:%d hei:%d fast:%d\n", len, hei, fast);
     if (fast)
     {
         if (len * hei > m_size)

@@ -6,7 +6,6 @@
 
 CDraft::CDraft(int width, int height)
 {
-    // ESP_LOGI(TAG, "Building Display Wrapper");
     m_buf = new uint8_t[width * height];
     m_width = width;
     m_height = height;
@@ -14,7 +13,6 @@ CDraft::CDraft(int width, int height)
 
 void CDraft::drawTile(uint16_t x, uint16_t y, const uint8_t *tile, bool alpha) const
 {
-    // ESP_LOGI(TAG, "Drawing tile at: %d %d %p", x, y, tile);
     uint8_t *d = m_buf + x + y * m_width;
     int i = 0;
     for (int yy = 0; yy < TILE_SIZE; ++yy)
@@ -32,7 +30,7 @@ void CDraft::drawTile(uint16_t x, uint16_t y, const uint8_t *tile, bool alpha) c
 
 void CDraft::fill(const uint16_t color) const
 {
-    printf("Fill Buffer %d x %d\n", m_width, m_height);
+    // printf("Fill Buffer %d x %d\n", m_width, m_height);
     for (int i = 0; i < m_width * m_height; ++i)
     {
         m_buf[i] = color;

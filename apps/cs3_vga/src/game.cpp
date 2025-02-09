@@ -163,7 +163,7 @@ bool CGame::decodeMap(int i)
     uint16_t j = 0;
     auto data = CEngine::dataPtr(offset);
     uint16_t count = data[0] + (data[1] << 8);
-    printf("attrs count:%d [0x%.4x]\n", count, count);
+    // printf("attrs count:%d [0x%.4x]\n", count, count);
     j += 2;
     while (count--)
     {

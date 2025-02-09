@@ -10,6 +10,7 @@
 #include "animator.h"
 #include "data.h"
 #include "gfx.h"
+#include "joystick.h"
 
 CDraft draft(CEngine::CONFIG_WIDTH, CEngine::TILE_SIZE);
 
@@ -17,6 +18,8 @@ auto_init_mutex(g_mutex);
 CEngine *g_engine = nullptr;
 CEngine *CEngine::getEngine()
 {
+    // auto &def = getTileDef(TILES_INSECT1);
+    // printf("INSECT1: speed %d\n", def.speed);
     if (!g_engine)
     {
         g_engine = new CEngine();
@@ -66,7 +69,7 @@ void CEngine::drawLevelIntro(GVga *gvga)
     uint16_t y = (CONFIG_HEIGHT - FONT_SIZE) / 2;
     gfx_clear(gvga, BLACK);
     draft.fill(BLACK);
-    printf("Draw Level Intro at: %d, %d\n", x, y);
+    // printf("Draw Level Intro at: %d, %d\n", x, y);
     draft.drawFont(x, 0, t, WHITE);
     drawBuffer(gvga, 0, y, draft.buf(), draft.width(), FONT_SIZE);
 }
@@ -104,7 +107,7 @@ void CEngine::drawScreen(GVga *gvga)
     int count;
     m_game->getMonsters(monsters, count);
 
-    for (uint16_t y = 0; y < rows; ++y)
+    for (int16_t y = 0; y < rows; ++y)
     {
         if (y == rows - 1)
         {
@@ -125,10 +128,12 @@ void CEngine::drawScreen(GVga *gvga)
             continue;
         }
 
-        for (uint16_t x = 0; x < cols; ++x)
+        for (int16_t x = 0; x < cols; ++x)
         {
             uint16_t j;
-            uint16_t i = y + my >= map.hei() ? TILES_BLANK : map.at(x + mx, y + my);
+            uint16_t i = (x + mx >= map.len()) || (y + my >= map.hei())
+                             ? TILES_BLANK
+                             : map.at(x + mx, y + my);
             if (i == TILES_ANNIE2)
             {
                 const int frame = player.getAim() * PLAYER_FRAMES + m_playerFrameOffset;
@@ -228,8 +233,7 @@ void CEngine::mainLoop(const uint32_t ticks)
         return;
     }
 
-    const uint16_t joyState = 0;
-    // m_gamepad ? m_gamepad->read() : 0; // readJoystick();
+    const uint16_t joyState = m_gamepad ? m_gamepad->read() : 0; // readJoystick();
     if (ticks % PLAYER_SPEED == 0 && !game.isPlayerDead())
     {
         game.managePlayer(joyState);
@@ -283,6 +287,9 @@ void CEngine::mainLoop(const uint32_t ticks)
 
 void CEngine::attach(IJoystick *gamepad)
 {
+    if (gamepad)
+        gamepad->init();
+
     m_gamepad = gamepad;
 }
 

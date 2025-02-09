@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <malloc.h>
 
 void print_buf(const uint8_t *buf, size_t len)
 {
@@ -11,4 +12,18 @@ void print_buf(const uint8_t *buf, size_t len)
         else
             printf(" ");
     }
+}
+
+uint32_t getTotalHeap(void)
+{
+    extern char __StackLimit, __bss_end__;
+
+    return &__StackLimit - &__bss_end__;
+}
+
+uint32_t getFreeHeap(void)
+{
+    struct mallinfo m = mallinfo();
+
+    return getTotalHeap() - m.uordblks;
 }

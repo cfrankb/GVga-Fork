@@ -3,7 +3,7 @@
 #include "animzdata.h"
 #include <cstring>
 
-CAnimator::animzSeq_t CAnimator::m_animzSeq[] = {
+const CAnimator::animzSeq_t CAnimator::m_animzSeq[] = {
     {TILES_DIAMOND, ANIMZ_DIAMOND, 13},
     {TILES_INSECT1, ANIMZ_INSECT1_DN, 8},
     {TILES_SWAMP, ANIMZ_SWAMP, 2},
@@ -25,8 +25,8 @@ CAnimator::CAnimator()
 {
     const uint32_t seqCount = sizeof(m_animzSeq) / sizeof(animzSeq_t);
     memset(m_tileReplacement, NO_ANIMZ, sizeof(m_tileReplacement));
-    m_seqIndex = new int32_t[seqCount];
-    memset(m_seqIndex, 0, seqCount * sizeof(uint32_t));
+    m_seqIndex = new uint8_t[seqCount];
+    memset(m_seqIndex, 0, seqCount * sizeof(uint8_t));
 }
 
 CAnimator::~CAnimator()
@@ -36,11 +36,11 @@ CAnimator::~CAnimator()
 
 void CAnimator::animate()
 {
-    const uint32_t seqCount = sizeof(m_animzSeq) / sizeof(animzSeq_t);
-    for (uint32_t i = 0; i < seqCount; ++i)
+    const uint16_t seqCount = sizeof(m_animzSeq) / sizeof(animzSeq_t);
+    for (uint16_t i = 0; i < seqCount; ++i)
     {
         const animzSeq_t &seq = m_animzSeq[i];
-        int32_t &index = m_seqIndex[i];
+        uint8_t &index = m_seqIndex[i];
         m_tileReplacement[seq.srcTile] = seq.startSeq + index;
         index = index < seq.count - 1 ? index + 1 : 0;
     }
@@ -52,7 +52,7 @@ uint8_t CAnimator::at(uint8_t tileID)
     return m_tileReplacement[tileID];
 }
 
-int CAnimator::offset()
+uint8_t CAnimator::offset()
 {
     return m_offset;
 }

@@ -21,13 +21,9 @@ public:
     uint8_t &at(int x, int y);
     uint8_t *row(int y);
     void set(int x, int y, uint8_t t);
-    bool read(const char *fname);
-    bool write(const char *fname);
-    bool read(FILE *sfile);
-    bool write(FILE *tfile);
     void forget();
-    int len() const;
-    int hei() const;
+    uint16_t len() const;
+    uint16_t hei() const;
     bool resize(uint16_t len, uint16_t hei, bool fast);
     const Pos findFirst(uint8_t tileId);
     int count(uint8_t tileId);
@@ -38,8 +34,6 @@ public:
     int size();
     const char *lastError();
     CMap &operator=(const CMap &map);
-    bool fromMemory(uint8_t *mem);
-    bool fromStream(FILE *sfile, uint16_t len, uint16_t hei);
 
     enum : uint16_t
     {
@@ -50,8 +44,6 @@ public:
         MAX = RIGHT,
         NOT_FOUND = 0xffff
     };
-    void shift(int aim);
-    void debug();
 
 protected:
     uint16_t m_len;

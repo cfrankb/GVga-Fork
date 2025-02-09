@@ -37,6 +37,7 @@ target_sources(${PROJECT} PUBLIC
     src/animator.cpp
     src/engine.cpp
     src/draft.cpp
+    src/joystick.cpp
     src/debug.cpp
 )
 

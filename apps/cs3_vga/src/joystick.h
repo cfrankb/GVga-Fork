@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include "driver/gpio.h"
 
 enum JoyDir
 {
@@ -14,7 +13,7 @@ enum JoyDir
     JOY_NONE = 0
 };
 
-#define NO_PIN static_cast<gpio_num_t>(-1)
+#define NO_PIN -1
 
 class IJoystick
 {
@@ -32,17 +31,18 @@ protected:
 
 public:
     virtual uint16_t read() = 0;
+    virtual void init();
 };
 
 class CGameController : public IJoystick
 {
 public:
-    CGameController(const gpio_num_t pinUp, const gpio_num_t pinDown, const gpio_num_t pinLeft, const gpio_num_t pinRight);
+    CGameController(const uint8_t pinUp, const uint8_t pinDown, const uint8_t pinLeft, const uint8_t pinRight);
     ~CGameController() override;
 
+    void init() override;
     uint16_t read() override;
 
 private:
-    void init();
-    gpio_num_t m_buttonsGPIO[ButtonCount];
+    uint8_t m_buttonsGPIO[ButtonCount];
 };

@@ -32,7 +32,7 @@ CActor::~CActor()
 {
 }
 
-bool CActor::canMove(int aim)
+bool CActor::canMove(const uint8_t aim)
 {
     CMap &map = CGame::getMap();
     const Pos &pos = Pos{m_x, m_y};
@@ -66,7 +66,7 @@ bool CActor::canMove(int aim)
     return false;
 }
 
-void CActor::move(const int aim)
+void CActor::move(const uint8_t aim)
 {
     CMap &map = CGame::getMap();
     uint8_t c = map.at(m_x, m_y);
@@ -152,7 +152,7 @@ void CActor::setType(const uint8_t type)
     m_type = type;
 }
 
-bool CActor::within(int x1, int y1, int x2, int y2) const
+bool CActor::within(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) const
 {
     return (m_x >= x1) && (m_x < x2) && (m_y >= y1) && (m_y < y2);
 }

@@ -20,8 +20,8 @@ public:
     CActor(const Pos &pos, uint8_t type = 0, uint8_t aim = 0);
     ~CActor();
 
-    bool canMove(int aim);
-    void move(const int aim);
+    bool canMove(const uint8_t aim);
+    void move(const uint8_t aim);
     uint8_t getX() const;
     uint8_t getY() const;
     uint8_t getPU() const;
@@ -33,7 +33,7 @@ public:
     bool isPlayerThere(uint8_t aim);
     uint8_t tileAt(uint8_t aim);
     void setType(const uint8_t type);
-    bool within(int x1, int y1, int x2, int y2) const;
+    bool within(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) const;
 
 protected:
     uint8_t m_x;

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <time.h>
-#include <malloc.h>
 #include "hardware/flash.h"
 #include "pico/stdlib.h"
 #include "gvga.h"
@@ -11,10 +10,13 @@
 #include "game.h"
 #include "engine.h"
 #include "debug.h"
+#include "joystick.h"
 
 #define BOARD_LED_PIN 25 // Example: GPIO 25, which is connected to the onboard LED
 int _state = 1;
 uint32_t _msLast;
+
+CGameController gamepad(18, 19, 20, 21);
 
 static void _init_led()
 {
@@ -109,20 +111,6 @@ void fillScreen(GVga *gvga)
 	}
 }
 
-uint32_t getTotalHeap(void)
-{
-	extern char __StackLimit, __bss_end__;
-
-	return &__StackLimit - &__bss_end__;
-}
-
-uint32_t getFreeHeap(void)
-{
-	struct mallinfo m = mallinfo();
-
-	return getTotalHeap() - m.uordblks;
-}
-
 int main()
 {
 	stdio_init_all();
@@ -157,6 +145,7 @@ int main()
 
 	CGame &game = *CGame::getGame();
 	CEngine &engine = *CEngine::getEngine();
+	engine.attach(&gamepad);
 	game.loadLevel(false);
 	uint32_t ticks = 0;
 
@@ -182,7 +171,7 @@ int main()
 		case CGame::MODE_LEVEL:
 			engine.drawScreen(gvga);
 		}
-		sleep_ms(1000 / 24);
+		sleep_ms(1000 / 12);
 		engine.mainLoop(ticks);
 	}
 }
